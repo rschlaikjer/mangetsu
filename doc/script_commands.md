@@ -28,6 +28,7 @@ _STRT(0,0,0,0,0)
 Text data offset
 2AF48/
 
+// Next page?
 _PGST(316)
 _PGST(-1)
 
@@ -44,7 +45,7 @@ _ZMb9b02($043579^@n)
 _ZMe3102(ボリュームテスト)
 _ZMe3103(音量テスト^　BGM100^　SE100^　)
 
-_ZZ: Load tag? 
+_ZZ: Load tag?
 _ZZe5d01(SEL12_01_CIEL12_3_2B)
 _ZZe5e01(SEL12_01_CIEL12_4)
 _ZZe5f01(SEL12_01_CIEL12_4B)
@@ -65,7 +66,7 @@ Non _Z command freqency:
   54049 _STCH
   53605 _STCP
   45272 _WKAD
-  34192 _FADS
+  34192 _FADS // Fade
   32138 _STZ4
   24237 _STMA
   21688 _STRT
@@ -73,13 +74,13 @@ Non _Z command freqency:
   16550 _VPLY
   14935 _STBR
   14360 _SEPL
-  14319 _WTTM
+  14319 _WTTM // Wait timer
   12853 _STEC
-  11530 _CLO3
+  11530 _CLO3 // Clear text
    8757 _SNX4
    7166 _STGS
    5048 _STCF
-   4771 _SCH2
+   4771 _SCH2 // Image display
    3362 _SEFD
    2922 _FANX
    1765 _JUMP

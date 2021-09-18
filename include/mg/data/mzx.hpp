@@ -6,7 +6,10 @@
 
 namespace mg::data {
 
-struct __attribute__((__packed__)) MxzHeader {
+struct __attribute__((__packed__)) MzxHeader {
+  static constexpr const char *FILE_MAGIC = "MZX0";
+
+  // Maic word
   uint8_t magic[4];
   // LE
   uint32_t decompressed_size;

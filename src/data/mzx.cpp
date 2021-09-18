@@ -12,13 +12,23 @@ static const uint8_t CMD_LITERAL = 3;
 bool mzx_decompress(const std::string &compressed, std::string &out,
                     bool invert) {
   // If header is too small, bail immediately
-  if (compressed.size() < sizeof(MxzHeader)) {
+  if (compressed.size() < sizeof(MzxHeader)) {
+    fprintf(stderr, "Header too small\n");
     return false;
   }
 
   // Pun start of data stream into header
-  MxzHeader header = *reinterpret_cast<const MxzHeader *>(compressed.data());
+  MzxHeader header = *reinterpret_cast<const MzxHeader *>(compressed.data());
   header.to_host_order();
+
+  // If the magic doesn't match, do not try and uncompress
+  if (memcmp(header.magic, MzxHeader::FILE_MAGIC, sizeof(header.magic)) != 0) {
+    fprintf(stderr, "Invalid file magic\n");
+    return false;
+  }
+
+  // Maic word
+  uint8_t magic[4];
 
   // Resize output buffer to accomodate decompressed data
   out.resize(header.decompressed_size);
@@ -35,7 +45,7 @@ bool mzx_decompress(const std::string &compressed, std::string &out,
   int clear_count = 0;
 
   // Start reading right after the header
-  std::string::size_type read_offset = sizeof(MxzHeader);
+  std::string::size_type read_offset = sizeof(MzxHeader);
   std::string::size_type decompress_offset = 0;
   unsigned ring_buffer_write_offset = 0;
   while (read_offset < compressed.size()) {

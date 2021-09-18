@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
+project(mangetsu LANGUAGES C CXX)
 
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
@@ -23,23 +24,81 @@ set(GCC_COVERAGE_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-unknown
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS} ${GCC_OPTIMIZATION}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
 
-project(mangetsu LANGUAGES C CXX)
+# Need openGL
+include(FindOpenGL)
+include_directories(${OPENGL_INCLUDE_DIRS})
+
+# Glfw for windowing
+find_package(PkgConfig)
+pkg_check_modules(PC_LIBGLFW REQUIRED glfw3)
+include_directories(${PC_LIBGLFW_INCLUDE_DIRS})
+
 
 include_directories(include)
 
+include_directories(vendor/imgui/)
+add_library(imgui
+    STATIC
+    vendor/imgui/imgui.cpp
+    vendor/imgui/imgui_draw.cpp
+    vendor/imgui/imgui_impl_glfw.cpp
+    vendor/imgui/imgui_impl_opengl2.cpp
+    vendor/imgui/imgui_tables.cpp
+    vendor/imgui/imgui_widgets.cpp
+)
+set_target_properties(imgui
+    PROPERTIES POSITION_INDEPENDENT_CODE ON
+)
+target_link_libraries(imgui
+   ${OPENGL_LIBRARIES}
+   ${PC_LIBGLFW_LIBRARIES}
+)
+
+add_library(mg_data
+  src/data/mzp.cpp
+  src/data/mzx.cpp
+  src/data/nam.cpp
+)
+
 add_executable(mangetsu
   src/mangetsu.cpp
-  src/data/mrg_text.cpp
-  src/data/mrg_data.cpp
-  src/data/mzx.cpp
 )
 target_link_libraries(mangetsu
-  lz4
-  ssl
-  crypto
+  mg_data
 )
 
 add_executable(mzx_decompress
     src/tools/mzx_decompress.cpp
-    src/data/mzx.cpp
+)
+target_link_libraries(mzx_decompress
+    mg_data
+)
+
+add_executable(mzp_info
+    src/tools/mzp_info.cpp
+)
+target_link_libraries(mzp_info
+    mg_data
+)
+
+add_executable(mzp_roundtrip
+    src/tools/mzp_roundtrip.cpp
+)
+target_link_libraries(mzp_roundtrip
+    mg_data
+)
+
+add_executable(nam_read
+    src/tools/nam_read.cpp
+)
+target_link_libraries(nam_read
+    mg_data
+)
+
+add_executable(data_explorer
+    src/tools/data_explorer.cpp
+)
+target_link_libraries(data_explorer
+    mg_data
+    imgui
 )
