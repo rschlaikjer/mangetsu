@@ -26,5 +26,6 @@ struct __attribute__((__packed__)) MzxHeader {
 
 bool mzx_decompress(const std::string &compressed, std::string &out,
                     bool invert = true);
+bool mzx_compress(const std::string &raw, std::string &out, bool invert = true);
 
 } // namespace mg::data

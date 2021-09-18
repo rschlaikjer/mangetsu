@@ -39,7 +39,7 @@ bool read_file(const char *path, std::string &out) {
 
 bool write_file(const char *path, const std::string &data) {
   // Open file
-  const int fd = open(path, O_RDWR | O_CREAT, 0644);
+  const int fd = open(path, O_RDWR | O_CREAT | O_TRUNC, 0644);
   if (fd == -1) {
     fprintf(stderr, "Failed to open '%s' - %s\n", path, strerror(errno));
     return false;

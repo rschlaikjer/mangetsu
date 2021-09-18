@@ -9,6 +9,65 @@ static const uint8_t CMD_BACKREF = 1;
 static const uint8_t CMD_RINGBUF = 2;
 static const uint8_t CMD_LITERAL = 3;
 
+bool mzx_compress(const std::string &raw, std::string &out, bool invert) {
+  // Don't bother actually compressing the data for now, just emit a valid
+  // stream of literals
+  MzxHeader header;
+  memcpy(header.magic, MzxHeader::FILE_MAGIC, sizeof(header.magic));
+  header.decompressed_size = raw.size();
+
+  // Estimate our final size
+  const std::string::size_type output_size =
+      sizeof(header) + raw.size() + 2 * ((raw.size() / 128) + 1);
+  out.resize(output_size);
+
+  // Write header
+  std::string::size_type output_offset = 0;
+  header.to_file_order();
+  memcpy(out.data(), &header, sizeof(header));
+  output_offset += sizeof(header);
+
+  for (std::string::size_type pos = 0; pos < raw.size();) {
+    // Len field is 6 bits, each word is 2 bytes, we can write 128 bytes per
+    // literal record
+    const std::string::size_type bytes_remaining = raw.size() - pos;
+    const unsigned bytes_to_write =
+        bytes_remaining < 128 ? bytes_remaining : 128;
+
+    // Convert that to a number of words to write.
+    // If we have a trailing byte, that needs an extra word.
+    uint8_t words_to_write = bytes_to_write / 2;
+    if (bytes_to_write & 1) {
+      words_to_write++;
+    }
+
+    // The number of words to write offset by one in the literal
+    words_to_write--;
+
+    // Pack the cmd
+    uint8_t cmd = CMD_LITERAL | (words_to_write << 2);
+    out[output_offset++] = cmd;
+
+    // Write the next bytes_to_write datums
+    memcpy(&out[output_offset], &raw[pos], bytes_to_write);
+    if (invert) {
+      for (std::string::size_type i = output_offset;
+           i < output_offset + bytes_to_write; i++) {
+        out[i] ^= 0xFF;
+      }
+    }
+    output_offset += bytes_to_write;
+
+    // Increment pos
+    pos += bytes_to_write;
+  }
+
+  // Shrink the output size down to the bytes we actually wrote
+  out.resize(output_offset);
+
+  return true;
+}
+
 bool mzx_decompress(const std::string &compressed, std::string &out,
                     bool invert) {
   // If header is too small, bail immediately

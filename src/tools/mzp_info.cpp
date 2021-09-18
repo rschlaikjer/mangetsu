@@ -21,19 +21,25 @@ int main(int argc, char **argv) {
     return -1;
   }
 
+  fprintf(stderr, "MZP archive of %lu elements:\n", mzp.entry_headers.size());
   for (auto &header : mzp.entry_headers) {
     header.print();
   }
 
-  // Split MZP into constituent files
-  // for (unsigned i = 0; i < mzp.entry_headers.size(); i++) {
-  //   std::string output_filename = mg::string::format("%s_%04u.bin", argv[1],
-  //   i); auto &data = mzp.entry_data[i]; if
-  //   (!mg::fs::write_file(output_filename.c_str(), data)) {
-  //     return -1;
-  //   }
-  //   fprintf(stderr, "Wrote %s\n", output_filename.c_str());
-  // }
+  for (unsigned i = 0; i < mzp.entry_headers.size(); i++) {
+    for (unsigned j = i + 1; j < mzp.entry_headers.size(); j++) {
+      // Do these ranges overlap
+      auto &entry_i = mzp.entry_headers[i];
+      auto &entry_j = mzp.entry_headers[j];
+      const uint32_t entry_i_start = entry_i.data_offset_relative();
+      const uint32_t entry_i_end = entry_i_start + entry_i.entry_data_size();
+      const uint32_t entry_j_start = entry_j.data_offset_relative();
+      const uint32_t entry_j_end = entry_j_start + entry_j.entry_data_size();
+      if (entry_j_start >= entry_i_start && entry_j_start <= entry_i_end) {
+        fprintf(stderr, "Entry %u begins inside of entry %u\n", j, i);
+      }
+    }
+  }
 
   return 0;
 }

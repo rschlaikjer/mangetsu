@@ -74,6 +74,13 @@ target_link_libraries(mzx_decompress
     mg_data
 )
 
+add_executable(mzx_compress
+    src/tools/mzx_compress.cpp
+)
+target_link_libraries(mzx_compress
+    mg_data
+)
+
 add_executable(mzp_info
     src/tools/mzp_info.cpp
 )
@@ -81,10 +88,17 @@ target_link_libraries(mzp_info
     mg_data
 )
 
-add_executable(mzp_roundtrip
-    src/tools/mzp_roundtrip.cpp
+add_executable(mzp_extract
+    src/tools/mzp_extract.cpp
 )
-target_link_libraries(mzp_roundtrip
+target_link_libraries(mzp_extract
+    mg_data
+)
+
+add_executable(mzp_compress
+    src/tools/mzp_compress.cpp
+)
+target_link_libraries(mzp_compress
     mg_data
 )
 
