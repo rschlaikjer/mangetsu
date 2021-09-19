@@ -1,65 +1,114 @@
-_VPLY(filename, ??): Play audio
 
-_WKST(F858,eq,0): ??
+`_VPLY`: Play audio
+```
+_VPLY(filename, ??)
+```
 
-_STCC(int): ??. Number is generally low (< 50)
+`_WKST`: ?? Some sort of wait?
+```
+_WKST(F858,eq,0):
+```
 
-_WNTY([0:1]): ??. Boolean operation.
+`_STCC`: ?? Number is generally low (< 50)
+```
+_STCC(int):
+```
 
-Some sort of image load routine.
+`_WNTY`: Some sort of Boolean operation.
+Seems that argument is 1 when this is the line is at the end of a page, otherwise 0
+```
+_WNTY([0:1])
+```
+
+`_STCH`: Some sort of image load routine.
+```
 _STCH(8,img2511,413,225,1000,0,3102,,CC,,,)
 _STCH(9,img2511,314,238,1000,0,3018,,CC,11,11,)
+```
 
-_STCP(uint, uint): ??
-_WKAD(F823,1): ?? Flag modification?
+`_STCP`: ??
+```
+_STCP(uint, uint):
+```
+
+`_WKAD`: ?? Flag modification?
+```
+_WKAD(F823,1):
+```
+
+`_FADS`: Fade in/out?
+```
 _FADS(1,0,0): ??
+```
 
+`_STZ4`: ??
+```
 _STZ4(15,720,720,720,720,0,0,0)
 _STZ4(16,-1000,1000,-1000,1000,0,0,0)
+```
 
+`_STMA`: ??
+```
 _STMA(23,0)
 _STMA(20,24014)
+```
 
+`_STRT`: ?
+```
 _STRT(0,0,0,0,0)
 _STRT(32,0,0,0,0)
 _STRT(1,0,0,0,0)
 _STRT(0,0,0,0,0)
+```
 
-Text data offset
-2AF48/
-
-// Next page?
+`_PGST`: Move relative page number?
+```
 _PGST(316)
 _PGST(-1)
+```
 
+`_STBR`: ?
+```
 _STBR(35,24)
 _STBR(39,17,,1)
+```
 
+`_SEPL`: ?
+```
 _SEPL(0,0,WOH_SE12027,,`017:100)
 _SEPL(1,0,MOON_SE02070,,`017:100)
 _SEPL(2,0,MOON_SEETC01B,,`017:100)
+```
 
-_ZM: Text from memory addr?
+`_ZM`: Text from memory addr?
+$ address seems to be an index into the script_text file
+Address can be followed by modifiers such as `@k`, `@e`, `@n`, `@x`
+```
 _ZMb961f($043578)
 _ZMb9b02($043579^@n)
 _ZMe3102(ボリュームテスト)
 _ZMe3103(音量テスト^　BGM100^　SE100^　)
+```
 
-_ZZ: Load tag?
+`_ZZ`: Load tag?
+```
 _ZZe5d01(SEL12_01_CIEL12_3_2B)
 _ZZe5e01(SEL12_01_CIEL12_4)
 _ZZe5f01(SEL12_01_CIEL12_4B)
 _ZZe6001(SEL12_01_CIEL12_5)
+```
 
-_ZY: ?
+`_ZY`: ?
+```
 _ZYe4800(LV01b00)
 _ZYe4a00(LV01c00)
 _ZYe4c00(LV01d00)
 _ZYa7100(LV00000)
 _ZYa7600(LV00000)
-
+```
 
 Non _Z command freqency:
+```
  481982 _WKST
   62293 _STCC
   58052 _WNTY
@@ -151,3 +200,4 @@ Non _Z command freqency:
       1 _RTMN
       1 _RTM2
       1 _IFUR
+```
