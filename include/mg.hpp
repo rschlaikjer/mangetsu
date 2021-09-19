@@ -2,7 +2,7 @@
 
 #define ASSERT(expr)                                                           \
   do {                                                                         \
-    if (!expr) {                                                               \
+    if (!(expr)) {                                                             \
       asm volatile("ud2");                                                     \
     }                                                                          \
   } while (false)

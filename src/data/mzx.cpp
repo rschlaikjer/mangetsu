@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include <mg.hpp>
 #include <mg/data/mzx.hpp>
 
 namespace mg::data {
@@ -119,13 +120,22 @@ bool mzx_decompress(const std::string &compressed, std::string &out,
       memset(last, invert ? 0xFF : 0x00, sizeof(last));
     }
 
+    auto emit_byte = [&](uint8_t byte) {
+      if (decompress_offset >= out.size()) {
+        // fprintf(stderr, "Tried to write %d bytes past end of buffer: %02x\n",
+        //         (int)decompress_offset - (int)out.size(), byte);
+        return;
+      }
+      out[decompress_offset++] = byte;
+    };
+
     switch (cmd) {
 
     case CMD_RLE: {
       // Repeat last two bytes len + 1 times
       for (unsigned i = 0; i <= len; i++) {
-        out[decompress_offset++] = last[0];
-        out[decompress_offset++] = last[1];
+        emit_byte(last[0]);
+        emit_byte(last[1]);
       }
     } break;
 
@@ -141,8 +151,8 @@ bool mzx_decompress(const std::string &compressed, std::string &out,
         last[1] = out[lookback_offset + 1];
 
         // Write those bytes to end of stream
-        out[decompress_offset++] = last[0];
-        out[decompress_offset++] = last[1];
+        emit_byte(last[0]);
+        emit_byte(last[1]);
       }
     } break;
 
@@ -151,8 +161,8 @@ bool mzx_decompress(const std::string &compressed, std::string &out,
       *reinterpret_cast<uint16_t *>(last) = ring_buffer[len];
 
       // Emit last
-      out[decompress_offset++] = last[0];
-      out[decompress_offset++] = last[1];
+      emit_byte(last[0]);
+      emit_byte(last[1]);
     } break;
 
     case CMD_LITERAL: {
@@ -160,13 +170,13 @@ bool mzx_decompress(const std::string &compressed, std::string &out,
         const uint8_t r0 = compressed[read_offset++] ^ (invert ? 0xFF : 0x00);
         const uint8_t r1 = compressed[read_offset++] ^ (invert ? 0xFF : 0x00);
 
-        // Emit data
-        out[decompress_offset++] = r0;
-        out[decompress_offset++] = r1;
-
         // Update last
         last[0] = r0;
         last[1] = r1;
+
+        // Emit data
+        emit_byte(last[0]);
+        emit_byte(last[1]);
 
         // Write to ring buffer
         ring_buffer[ring_buffer_write_offset++] = (r1 << 8) | r0;
