@@ -137,9 +137,11 @@ struct DataFile {
       }
     }
 
+    int i = 0;
     for (auto &str :
          *reinterpret_cast<std::vector<std::string> *>(parsed_data)) {
       ImGui::Separator();
+      ImGui::Text("%d", i++);
       ImGui::Text(str.c_str());
     }
 
