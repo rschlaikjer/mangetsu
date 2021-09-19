@@ -155,7 +155,10 @@ struct DataFile {
 
   bool render_nam() {
     mg::data::Nam *nam = reinterpret_cast<mg::data::Nam *>(parsed_data);
+    int i = 0;
     for (auto &name : nam->names) {
+      ImGui::Separator();
+      ImGui::Text("%d", i++);
       ImGui::Text(name.c_str());
     }
     return false;
