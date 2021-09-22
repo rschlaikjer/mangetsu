@@ -93,6 +93,7 @@ add_executable(mzp_extract
 )
 target_link_libraries(mzp_extract
     mg_data
+    stdc++fs
 )
 
 add_executable(mzp_compress
