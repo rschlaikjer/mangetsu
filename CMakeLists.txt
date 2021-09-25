@@ -36,6 +36,9 @@ include_directories(${PC_LIBGLFW_INCLUDE_DIRS})
 
 include_directories(include)
 
+# Json library
+include_directories(vendor/json)
+
 include_directories(vendor/imgui/)
 add_library(imgui
     STATIC
@@ -116,4 +119,13 @@ add_executable(data_explorer
 target_link_libraries(data_explorer
     mg_data
     imgui
+)
+
+add_executable(script_text_to_content_json
+    src/tools/script_text_to_content_json.cpp
+)
+target_link_libraries(script_text_to_content_json
+    mg_data
+    ssl
+    crypto
 )
