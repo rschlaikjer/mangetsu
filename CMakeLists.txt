@@ -129,3 +129,12 @@ target_link_libraries(script_text_to_content_json
     ssl
     crypto
 )
+
+add_executable(repack_script_text_translation
+    src/tools/repack_script_text_translation.cpp
+)
+target_link_libraries(repack_script_text_translation
+    mg_data
+    ssl
+    crypto
+)

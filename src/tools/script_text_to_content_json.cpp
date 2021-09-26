@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
   }
 
   // Serialize and emit
-  const std::string serialized_json = j.dump();
+  const std::string serialized_json = j.dump(2);
   if (!mg::fs::write_file(output_filename, serialized_json)) {
     fprintf(stderr, "Failed to write '%s'\n", output_filename);
     return -1;

@@ -72,6 +72,16 @@ struct Mzp {
   uint32_t archive_entry_start_offset(const MzpArchiveEntry &entry) {
     return data_start_offset() + entry.data_offset_relative();
   }
+
+  void add_entry(std::string entry) {
+    // Create a new header and update the size field
+    MzpArchiveEntry header;
+    header.set_data_size(entry.size());
+    entry_headers.emplace_back(header);
+
+    // Add the data
+    entry_data.emplace_back(entry);
+  }
 };
 
 bool mzp_read(const std::string &data, Mzp &out);
