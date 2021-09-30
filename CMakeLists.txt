@@ -60,6 +60,7 @@ target_link_libraries(imgui
 add_library(mg_data
   src/data/mzp.cpp
   src/data/mzx.cpp
+  src/data/mrg.cpp
   src/data/nam.cpp
 )
 
@@ -137,4 +138,12 @@ target_link_libraries(repack_script_text_translation
     mg_data
     ssl
     crypto
+)
+
+add_executable(mrg_extract
+    src/tools/mrg_extract.cpp
+)
+target_link_libraries(mrg_extract
+    mg_data
+    stdc++fs
 )
