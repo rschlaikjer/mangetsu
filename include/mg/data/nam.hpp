@@ -15,5 +15,6 @@ struct Nam {
 };
 
 bool nam_read(const std::string &data, Nam &out);
+bool nam_write(const Nam &in, std::string &out);
 
 } // namespace mg::data

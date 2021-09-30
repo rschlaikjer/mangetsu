@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <mg/data/mrg.hpp>
 #include <mg/util/endian.hpp>
 
@@ -50,7 +52,44 @@ bool mrg_read(const std::string &hed, const std::string &mrg, Mrg &out) {
 }
 
 bool mrg_write(const Mrg &in, std::string &hed, std::string &mrg) {
-  return false;
+  // Work out the total header size
+  // Note that there are 2 extra header entries of 0xFF for EOF
+  const ssize_t header_size =
+      (in.entries.size() + 2) * sizeof(Mrg::PackedEntryHeader);
+  hed.resize(header_size);
+
+  // Conversion of real bytes -> total sectors consumed
+  auto size_in_sectors = [](unsigned byte_count) -> uint32_t {
+    const uint32_t full_sectors = byte_count / Mrg::SECTOR_SIZE;
+    return full_sectors + (byte_count % Mrg::SECTOR_SIZE ? 1 : 0);
+  };
+
+  // Serialize each entry
+  Mrg::PackedEntryHeader *headers =
+      reinterpret_cast<Mrg::PackedEntryHeader *>(hed.data());
+  ssize_t mrg_write_offset_sectors = 0;
+  mrg.clear();
+  for (unsigned i = 0; i < in.entries.size(); i++) {
+    // Pack header
+    headers[i].offset = mrg_write_offset_sectors;
+    headers[i].size_sectors = size_in_sectors(in.entries[i].size());
+
+    // Copy data
+    mrg.resize(mrg.size() + headers[i].size_sectors * Mrg::SECTOR_SIZE, '\0');
+    memcpy(&mrg[mrg_write_offset_sectors * Mrg::SECTOR_SIZE],
+           in.entries[i].data(), in.entries[i].size());
+
+    // Increment write offset
+    mrg_write_offset_sectors += headers[i].size_sectors;
+
+    // Header to file order
+    headers[i].to_file_order();
+  }
+
+  // Write EOF on the HED file
+  memset(&headers[in.entries.size()], 0xFF, sizeof(Mrg::PackedEntryHeader) * 2);
+
+  return true;
 }
 
 } // namespace mg::data

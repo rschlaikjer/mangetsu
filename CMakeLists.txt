@@ -164,3 +164,11 @@ target_link_libraries(mrg_extract
     mg_data
     stdc++fs
 )
+
+add_executable(mrg_pack
+    src/tools/mrg_pack.cpp
+)
+target_link_libraries(mrg_pack
+    mg_data
+    stdc++fs
+)
