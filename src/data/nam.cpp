@@ -36,8 +36,8 @@ bool nam_read(const std::string &data, Nam &out) {
 }
 
 bool nam_write(const Nam &in, std::string &out) {
-  // Resize output buffer to fit string table
-  out.resize(in.names.size() * Nam::MAX_STRLEN, '\0');
+  // Resize output buffer to fit string table + EOF marker
+  out.resize((in.names.size() + 1) * Nam::MAX_STRLEN, '\0');
 
   // Insert each name, truncating if too long
   for (std ::vector<std::string>::size_type i = 0; i < in.names.size(); i++) {

@@ -86,6 +86,7 @@ int main(int argc, char **argv) {
       fprintf(stderr, "Failed to serialize NAM\n");
       return -1;
     }
+
     std::string nam_filename = mg::string::format("%s.nam", output_basename);
     if (!mg::fs::write_file(nam_filename.c_str(), nam_out)) {
       return -1;
