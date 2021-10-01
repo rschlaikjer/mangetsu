@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     // If we have a name table, use that name as well
     if (has_nam) {
       output_filename = mg::string::format(
-          "%s.%04lu.%s.dat", output_basename.c_str(), i, nam.names[i].c_str());
+          "%s.%08lu.%s.dat", output_basename.c_str(), i, nam.names[i].c_str());
     }
 
     std::filesystem::path output_path = output_dir;
