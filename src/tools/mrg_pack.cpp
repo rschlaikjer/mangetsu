@@ -1,5 +1,6 @@
 #include <mg/data/mrg.hpp>
 #include <mg/data/nam.hpp>
+#include <mg/data/nxx.hpp>
 #include <mg/util/fs.hpp>
 #include <mg/util/string.hpp>
 
@@ -43,7 +44,22 @@ int main(int argc, char **argv) {
     if (!mg::fs::read_file(input, data)) {
       return -1;
     }
-    mrg.entries.emplace_back(data);
+
+    // Attempt to detect certain compressed formats, so that we can put the
+    // correct decompressed size in the hed
+    bool compressed = false;
+    uint64_t decompressed_size = -1;
+
+    // Nxx?
+    {
+      mg::data::Nxx nxx_header;
+      if (extract_nxx_header(data, nxx_header)) {
+        compressed = true;
+        decompressed_size = nxx_header.size;
+      }
+    }
+
+    mrg.entries.emplace_back(data, compressed, decompressed_size);
   }
 
   // If we were given a name file, create a NAM file as well

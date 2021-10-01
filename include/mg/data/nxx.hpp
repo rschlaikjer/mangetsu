@@ -19,6 +19,9 @@ struct __attribute__((packed)) Nxx {
 };
 static_assert(sizeof(Nxx) == 16);
 
+bool is_nxx_data(const std::string &data);
+bool extract_nxx_header(const std::string &data, Nxx &out);
+
 bool nxx_decompress(const std::string &in, std::string &out);
 bool nxgx_decompress(const Nxx &header, const uint8_t *data, std::string &out);
 bool nxcx_decompress(const Nxx &header, const uint8_t *data, std::string &out);

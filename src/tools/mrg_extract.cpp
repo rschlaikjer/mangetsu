@@ -66,9 +66,9 @@ int main(int argc, char **argv) {
   const std::string output_basename =
       std::filesystem::path(input_basename).stem();
   for (std::vector<std::string>::size_type i = 0; i < mrg.entries.size(); i++) {
-    const auto &data = mrg.entries[i];
+    const auto &entry = mrg.entries[i];
     std::string output_filename =
-        mg::string::format("%s.%04lu.dat", output_basename.c_str(), i);
+        mg::string::format("%s.%08lu.dat", output_basename.c_str(), i);
 
     // If we have a name table, use that name as well
     if (has_nam) {
@@ -78,10 +78,10 @@ int main(int argc, char **argv) {
 
     std::filesystem::path output_path = output_dir;
     output_path.append(output_filename);
-    if (!mg::fs::write_file(output_path.c_str(), data)) {
+    if (!mg::fs::write_file(output_path.c_str(), entry.data)) {
       return -1;
     }
-    fprintf(stderr, "Wrote %lu bytes to %s\n", data.size(),
+    fprintf(stderr, "Wrote %lu bytes to %s\n", entry.data.size(),
             output_path.c_str());
   }
 

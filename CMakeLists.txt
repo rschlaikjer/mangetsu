@@ -64,6 +64,9 @@ add_library(mg_data
   src/data/nam.cpp
   src/data/nxx.cpp
 )
+target_link_libraries(mg_data
+    z
+)
 
 add_executable(mangetsu
   src/mangetsu.cpp
@@ -77,7 +80,6 @@ add_executable(nxx_decompress
 )
 target_link_libraries(nxx_decompress
     mg_data
-    z
 )
 
 add_executable(nxgx_compress
@@ -85,7 +87,6 @@ add_executable(nxgx_compress
 )
 target_link_libraries(nxgx_compress
     mg_data
-    z
 )
 
 add_executable(mzx_decompress

@@ -8,13 +8,13 @@ namespace mg::data {
 void Mrg::PackedEntryHeader::to_host_order() {
   offset = mg::le_to_host_u32(offset);
   size_sectors = mg::le_to_host_u16(size_sectors);
-  _padding = mg::le_to_host_u16(_padding);
+  size_uncompressed_sectors = mg::le_to_host_u16(size_uncompressed_sectors);
 }
 
 void Mrg::PackedEntryHeader::to_file_order() {
   offset = mg::host_to_le_u32(offset);
   size_sectors = mg::host_to_le_u16(size_sectors);
-  _padding = mg::host_to_le_u16(_padding);
+  size_uncompressed_sectors = mg::host_to_le_u16(size_uncompressed_sectors);
 }
 
 bool mrg_read(const std::string &hed, const std::string &mrg, Mrg &out) {
@@ -44,8 +44,9 @@ bool mrg_read(const std::string &hed, const std::string &mrg, Mrg &out) {
     }
 
     // Excise the source data at the specified offset + len
-    out.entries.emplace_back(&mrg[header.offset * Mrg::SECTOR_SIZE],
-                             header.size_sectors * Mrg::SECTOR_SIZE);
+    out.entries.emplace_back(
+        std::string(&mrg[header.offset * Mrg::SECTOR_SIZE],
+                    header.size_sectors * Mrg::SECTOR_SIZE));
   }
 
   return true;
@@ -72,12 +73,22 @@ bool mrg_write(const Mrg &in, std::string &hed, std::string &mrg) {
   for (unsigned i = 0; i < in.entries.size(); i++) {
     // Pack header
     headers[i].offset = mrg_write_offset_sectors;
-    headers[i].size_sectors = size_in_sectors(in.entries[i].size());
+    headers[i].size_sectors = size_in_sectors(in.entries[i].data.size());
+
+    // If the entry is compressed, use the correct uncompressed size
+    // Else, use the normal size
+    if (in.entries[i].is_compressed) {
+      headers[i].size_uncompressed_sectors =
+          size_in_sectors(in.entries[i].uncompressed_size_bytes);
+    } else {
+      headers[i].size_uncompressed_sectors =
+          size_in_sectors(in.entries[i].data.size());
+    }
 
     // Copy data
     mrg.resize(mrg.size() + headers[i].size_sectors * Mrg::SECTOR_SIZE, '\0');
     memcpy(&mrg[mrg_write_offset_sectors * Mrg::SECTOR_SIZE],
-           in.entries[i].data(), in.entries[i].size());
+           in.entries[i].data.data(), in.entries[i].data.size());
 
     // Increment write offset
     mrg_write_offset_sectors += headers[i].size_sectors;

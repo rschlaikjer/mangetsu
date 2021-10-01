@@ -20,6 +20,39 @@ void Nxx::to_file_order() {
   compressed_size = mg::host_to_le_u32(compressed_size);
 }
 
+bool is_nxx_data(const std::string &in) {
+  // Test big enough to have header
+  if (in.size() < sizeof(Nxx)) {
+    fprintf(stderr, "NXX file too small\n");
+    return false;
+  }
+
+  // Check for known file magic
+  Nxx header = *reinterpret_cast<const Nxx *>(in.data());
+
+  if (!strncmp(header.magic, MAGIC_NXCX, sizeof(header.magic))) {
+    return true;
+  }
+
+  if (!strncmp(header.magic, MAGIC_NXGX, sizeof(header.magic))) {
+    return true;
+  }
+
+  return false;
+}
+
+bool extract_nxx_header(const std::string &in, Nxx &out) {
+  // Does this look like nxx?
+  if (!is_nxx_data(in)) {
+    return false;
+  }
+
+  // Pun header
+  out = *reinterpret_cast<const Nxx *>(in.data());
+  out.to_host_order();
+  return true;
+}
+
 bool nxx_decompress(const std::string &in, std::string &out) {
   // Input large enough to contain header?
   if (in.size() < sizeof(Nxx)) {
