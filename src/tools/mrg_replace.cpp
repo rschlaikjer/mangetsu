@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
     // Create the header for this next entry. Offset must always be the new
     // current mrg offset.
     mg::data::Mrg::PackedEntryHeader header;
-    header.offset = mrg_write_offset;
+    header.offset = mrg_write_offset / mg::data::Mrg::SECTOR_SIZE;
 
     // Do we want to replace this index?
     const bool replace_index = replace_indices.find(i) != replace_indices.end();
