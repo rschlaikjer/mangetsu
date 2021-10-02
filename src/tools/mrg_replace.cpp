@@ -62,12 +62,12 @@ int main(int argc, char **argv) {
   }
 
   // Check args are OK
-  if (replace_indices.size() == 0) {
-    fprintf(stderr, "No files to replace - exiting\n");
-    return -1;
-  }
   if (input_basename == nullptr || output_basename == nullptr) {
     usage(argv[0]);
+    return -1;
+  }
+  if (replace_indices.size() == 0) {
+    fprintf(stderr, "No files to replace - exiting\n");
     return -1;
   }
 
