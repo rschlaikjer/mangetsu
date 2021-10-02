@@ -21,6 +21,9 @@ public:
 public:
   const uint8_t *data() const { return _data; }
   ssize_t size() const { return _size; }
+  std::string_view string_view() const {
+    return std::string_view(reinterpret_cast<const char *>(_data), _size);
+  }
 
 private:
   MappedFile(const uint8_t *data, ssize_t size) : _data(data), _size(size) {}

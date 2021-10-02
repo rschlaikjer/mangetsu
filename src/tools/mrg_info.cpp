@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 
   // If we have a NAM and MRG, assert that the filename count matches the entry
   // count
-  if (mrg->entries().size() != nam.names.size()) {
+  if (has_nam && mrg->entries().size() != nam.names.size()) {
     fprintf(stderr,
             "MRG entry count (%lu) does not match NAM entry count (%lu)\n",
             mrg->entries().size(), nam.names.size());

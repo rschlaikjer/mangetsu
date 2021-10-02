@@ -60,6 +60,12 @@ int main(int argc, char **argv) {
     return -1;
   }
 
+  // Check args are OK
+  if (input_basename == nullptr || output_path == nullptr) {
+    usage(argv[0]);
+    return -1;
+  }
+
   // Test for input files
   const std::string hed_filename = mg::string::format("%s.hed", input_basename);
   const std::string mrg_filename = mg::string::format("%s.mrg", input_basename);
@@ -92,7 +98,7 @@ int main(int argc, char **argv) {
 
   // If we have a NAM and MRG, assert that the filename count matches the entry
   // count
-  if (mrg->entries().size() != nam.names.size()) {
+  if (has_nam && mrg->entries().size() != nam.names.size()) {
     fprintf(stderr,
             "MRG entry count (%lu) does not match NAM entry count (%lu)\n",
             mrg->entries().size(), nam.names.size());

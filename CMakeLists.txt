@@ -186,3 +186,11 @@ target_link_libraries(mrg_info
     mg_data
     stdc++fs
 )
+
+add_executable(mrg_replace
+    src/tools/mrg_replace.cpp
+)
+target_link_libraries(mrg_replace
+    mg_data
+    stdc++fs
+)

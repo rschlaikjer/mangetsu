@@ -20,7 +20,7 @@ void Nxx::to_file_order() {
   compressed_size = mg::host_to_le_u32(compressed_size);
 }
 
-bool is_nxx_data(const std::string &in) {
+bool is_nxx_data(const std::string_view &in) {
   // Test big enough to have header
   if (in.size() < sizeof(Nxx)) {
     fprintf(stderr, "NXX file too small\n");
@@ -41,7 +41,7 @@ bool is_nxx_data(const std::string &in) {
   return false;
 }
 
-bool extract_nxx_header(const std::string &in, Nxx &out) {
+bool extract_nxx_header(const std::string_view &in, Nxx &out) {
   // Does this look like nxx?
   if (!is_nxx_data(in)) {
     return false;
@@ -53,7 +53,7 @@ bool extract_nxx_header(const std::string &in, Nxx &out) {
   return true;
 }
 
-bool nxx_decompress(const std::string &in, std::string &out) {
+bool nxx_decompress(const std::string_view &in, std::string &out) {
   // Input large enough to contain header?
   if (in.size() < sizeof(Nxx)) {
     fprintf(stderr, "NXX file too small\n");
@@ -133,7 +133,7 @@ bool nxcx_decompress(const Nxx &header, const uint8_t *data, std::string &out) {
   return true;
 }
 
-bool nxgx_compress(const std::string &in, std::string &out) {
+bool nxgx_compress(const std::string_view &in, std::string &out) {
   // Create stream context
   z_stream dstream{};
   dstream.avail_in = in.size();
@@ -183,6 +183,8 @@ bool nxgx_compress(const std::string &in, std::string &out) {
   return true;
 }
 
-bool nxcx_compress(const std::string &in, std::string &out) { return false; }
+bool nxcx_compress(const std::string_view &in, std::string &out) {
+  return false;
+}
 
 } // namespace mg::data

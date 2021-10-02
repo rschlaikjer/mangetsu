@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace mg::data {
@@ -19,14 +20,14 @@ struct __attribute__((packed)) Nxx {
 };
 static_assert(sizeof(Nxx) == 16);
 
-bool is_nxx_data(const std::string &data);
-bool extract_nxx_header(const std::string &data, Nxx &out);
+bool is_nxx_data(const std::string_view &data);
+bool extract_nxx_header(const std::string_view &data, Nxx &out);
 
-bool nxx_decompress(const std::string &in, std::string &out);
+bool nxx_decompress(const std::string_view &in, std::string &out);
 bool nxgx_decompress(const Nxx &header, const uint8_t *data, std::string &out);
 bool nxcx_decompress(const Nxx &header, const uint8_t *data, std::string &out);
 
-bool nxgx_compress(const std::string &in, std::string &out);
-bool nxcx_compress(const std::string &in, std::string &out);
+bool nxgx_compress(const std::string_view &in, std::string &out);
+bool nxcx_compress(const std::string_view &in, std::string &out);
 
 } // namespace mg::data

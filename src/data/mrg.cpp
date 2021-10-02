@@ -59,12 +59,6 @@ bool mrg_write(const Mrg &in, std::string &hed, std::string &mrg) {
       (in.entries.size() + 2) * sizeof(Mrg::PackedEntryHeader);
   hed.resize(header_size);
 
-  // Conversion of real bytes -> total sectors consumed
-  auto size_in_sectors = [](unsigned byte_count) -> uint32_t {
-    const uint32_t full_sectors = byte_count / Mrg::SECTOR_SIZE;
-    return full_sectors + (byte_count % Mrg::SECTOR_SIZE ? 1 : 0);
-  };
-
   // Serialize each entry
   Mrg::PackedEntryHeader *headers =
       reinterpret_cast<Mrg::PackedEntryHeader *>(hed.data());
@@ -73,16 +67,16 @@ bool mrg_write(const Mrg &in, std::string &hed, std::string &mrg) {
   for (unsigned i = 0; i < in.entries.size(); i++) {
     // Pack header
     headers[i].offset = mrg_write_offset_sectors;
-    headers[i].size_sectors = size_in_sectors(in.entries[i].data.size());
+    headers[i].size_sectors = Mrg::size_in_sectors(in.entries[i].data.size());
 
     // If the entry is compressed, use the correct uncompressed size
     // Else, use the normal size
     if (in.entries[i].is_compressed) {
       headers[i].size_uncompressed_sectors =
-          size_in_sectors(in.entries[i].uncompressed_size_bytes);
+          Mrg::size_in_sectors(in.entries[i].uncompressed_size_bytes);
     } else {
       headers[i].size_uncompressed_sectors =
-          size_in_sectors(in.entries[i].data.size());
+          Mrg::size_in_sectors(in.entries[i].data.size());
     }
 
     // Copy data

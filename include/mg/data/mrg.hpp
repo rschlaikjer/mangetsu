@@ -15,6 +15,11 @@ struct Mrg {
 
   static const uint32_t SECTOR_SIZE = 0x800;
 
+  static unsigned size_in_sectors(unsigned size_bytes) {
+    const uint32_t full_sectors = size_bytes / Mrg::SECTOR_SIZE;
+    return full_sectors + (size_bytes % SECTOR_SIZE ? 1 : 0);
+  }
+
   struct __attribute__((packed)) PackedEntryHeader {
     // Start offset in file of data, in sectors.. LE.
     uint32_t offset;
