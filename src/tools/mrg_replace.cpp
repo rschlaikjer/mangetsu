@@ -191,6 +191,7 @@ int main(int argc, char **argv) {
       const auto old_data = mrg->entry_data(i);
       ASSERT(write(mrg_fd, old_data.data(), old_data.size()) ==
              (ssize_t)old_data.size());
+      mrg_write_offset += old_data.size();
     }
 
     // Write the hew HED entry
