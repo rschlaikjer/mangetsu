@@ -57,6 +57,10 @@ target_link_libraries(imgui
    ${PC_LIBGLFW_LIBRARIES}
 )
 
+add_library(mg_util
+  src/util/fs.cpp
+)
+
 add_library(mg_data
   src/data/mzp.cpp
   src/data/mzx.cpp
@@ -66,6 +70,7 @@ add_library(mg_data
 )
 target_link_libraries(mg_data
     z
+    mg_util
 )
 
 add_executable(mangetsu
@@ -170,6 +175,14 @@ add_executable(mrg_pack
     src/tools/mrg_pack.cpp
 )
 target_link_libraries(mrg_pack
+    mg_data
+    stdc++fs
+)
+
+add_executable(mrg_info
+    src/tools/mrg_info.cpp
+)
+target_link_libraries(mrg_info
     mg_data
     stdc++fs
 )

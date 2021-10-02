@@ -103,4 +103,40 @@ bool mrg_write(const Mrg &in, std::string &hed, std::string &mrg) {
   return true;
 }
 
+std::unique_ptr<MappedMrg>
+MappedMrg::parse(const std::string &hed,
+                 std::shared_ptr<mg::fs::MappedFile> backing_data) {
+  // Check header size valid
+  if (hed.size() % sizeof(Mrg::PackedEntryHeader) != 0) {
+    fprintf(stderr, "Wrong size for HED, must be multiple of %lu\n",
+            sizeof(Mrg::PackedEntryHeader));
+    return nullptr;
+  }
+
+  // Reinterpret header
+  const ssize_t entry_count = hed.size() / sizeof(Mrg::PackedEntryHeader);
+  const Mrg::PackedEntryHeader *raw_entries =
+      reinterpret_cast<const Mrg::PackedEntryHeader *>(hed.data());
+
+  // Load entry table
+  std::vector<Mrg::PackedEntryHeader> entries;
+  for (ssize_t i = 0; i < entry_count; i++) {
+    // Copy current header
+    Mrg::PackedEntryHeader header = raw_entries[i];
+
+    // Endian swap to host
+    header.to_host_order();
+
+    // Is this EOF?
+    if (header.offset == 0xFFFF'FFFF) {
+      break;
+    }
+
+    // Emplace into list
+    entries.emplace_back(header);
+  }
+
+  return std::unique_ptr<MappedMrg>(new MappedMrg(backing_data, entries));
+}
+
 } // namespace mg::data

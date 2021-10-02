@@ -12,52 +12,26 @@
 
 namespace mg::fs {
 
-bool read_file(const char *path, std::string &out) {
-  // Open file
-  const int fd = open(path, O_RDONLY);
-  if (fd == -1) {
-    fprintf(stderr, "Failed to open '%s' - %s\n", path, strerror(errno));
-    return false;
-  }
-  std::shared_ptr<void> _defer_close_fd(nullptr, [=](...) { close(fd); });
+class MappedFile {
+public:
+  static std::unique_ptr<MappedFile> open(const char *filename);
+  ~MappedFile();
 
-  static const size_t read_blocksz = 4096;
-  char buffer[read_blocksz];
-  out.clear();
-  ssize_t bytes_read = 0;
-  do {
-    bytes_read = read(fd, buffer, read_blocksz);
-    if (bytes_read == -1) {
-      fprintf(stderr, "Failed to read '%s' - %s\n", path, strerror(errno));
-      return false;
-    }
-    out.append(buffer, bytes_read);
-  } while (bytes_read == read_blocksz);
+public:
+  uint8_t *mutable_data();
+  const uint8_t *data() const;
+  ssize_t size() const;
 
-  return true;
-}
+private:
+  MappedFile(const uint8_t *data, ssize_t size) : _data(data), _size(size) {}
+  MappedFile(const MappedFile &other) = delete;
+  MappedFile &operator=(const MappedFile &other) = delete;
 
-bool write_file(const char *path, const std::string &data) {
-  // Open file
-  const int fd = open(path, O_RDWR | O_CREAT | O_TRUNC, 0644);
-  if (fd == -1) {
-    fprintf(stderr, "Failed to open '%s' - %s\n", path, strerror(errno));
-    return false;
-  }
-  std::shared_ptr<void> _defer_close_fd(nullptr, [=](...) { close(fd); });
+  const uint8_t *const _data;
+  const ssize_t _size;
+};
 
-  size_t total_bytes_written = 0;
-  do {
-    int wrote_bytes = write(fd, &data[total_bytes_written],
-                            data.size() - total_bytes_written);
-    if (wrote_bytes == -1) {
-      fprintf(stderr, "Failed to write '%s' - %s\n", path, strerror(errno));
-      return false;
-    }
-    total_bytes_written += wrote_bytes;
-  } while (total_bytes_written < data.size());
-
-  return true;
-}
+bool read_file(const char *path, std::string &out);
+bool write_file(const char *path, const std::string &data);
 
 } // namespace mg::fs

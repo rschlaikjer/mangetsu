@@ -2,8 +2,11 @@
 
 #include <stdint.h>
 
+#include <memory>
 #include <string>
 #include <vector>
+
+#include <mg/util/fs.hpp>
 
 namespace mg::data {
 
@@ -46,6 +49,32 @@ struct Mrg {
   };
 
   std::vector<Entry> entries;
+};
+
+struct MappedMrg {
+public:
+  static std::unique_ptr<MappedMrg>
+  parse(const std::string &header,
+        std::shared_ptr<mg::fs::MappedFile> backing_data);
+
+  const std::vector<Mrg::PackedEntryHeader> &entries() const {
+    return _entries;
+  }
+  const std::string_view entry_data(int index) const {
+    const auto &entry = _entries.at(index);
+    const unsigned size_bytes = entry.size_sectors * Mrg::SECTOR_SIZE;
+    return std::string_view(
+        reinterpret_cast<const char *>(_backing_data->data()) + entry.offset,
+        size_bytes);
+  }
+
+private:
+  MappedMrg(std::shared_ptr<mg::fs::MappedFile> backing_data,
+            std::vector<Mrg::PackedEntryHeader> entries)
+      : _backing_data(backing_data), _entries(entries) {}
+
+  std::shared_ptr<mg::fs::MappedFile> _backing_data;
+  std::vector<Mrg::PackedEntryHeader> _entries;
 };
 
 bool mrg_read(const std::string &hed, const std::string &mrg, Mrg &out);
