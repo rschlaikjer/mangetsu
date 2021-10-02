@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
   }
 
   // Check args are OK
-  if (input_basename == nullptr || output_path == nullptr) {
+  if (input_basename == nullptr) {
     usage(argv[0]);
     return -1;
   }

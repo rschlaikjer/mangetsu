@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
             ? ""
             : mg::string::format(", Uncompressed size 0x%08x sectors",
                                  mrg->entries()[i].size_uncompressed_sectors);
-    fprintf(stderr, "Entry %08u: Offset 0x%08x, Size 0x%08x sectors%s%s\n", i,
+    fprintf(stderr, "Entry %08u: Offset 0x%016x, Size 0x%08x sectors%s%s\n", i,
             mrg->entries()[i].offset, mrg->entries()[i].size_sectors,
             compress_info.c_str(), name_info.c_str());
   }
