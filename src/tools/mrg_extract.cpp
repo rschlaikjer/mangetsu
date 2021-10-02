@@ -1,18 +1,66 @@
+#include <filesystem>
+#include <set>
+
 #include <mg/data/mrg.hpp>
 #include <mg/data/nam.hpp>
 #include <mg/util/fs.hpp>
 #include <mg/util/string.hpp>
 
-#include <filesystem>
+void usage(const char *program_name) {
+  fprintf(stderr, "%s [-i index...] input_basename [output_dir]\n",
+          program_name);
+}
 
 int main(int argc, char **argv) {
-  if (argc != 2 && argc != 3) {
-    fprintf(stderr, "%s input_basename [out_dir]\n", argv[0]);
+  // Parse args
+  bool targeted_extract = false;
+  std::set<long> extract_indices;
+
+  const char *input_basename = nullptr;
+  const char *output_path = nullptr;
+  for (int i = 1; i < argc; i++) {
+    if (!strcmp("-i", argv[i])) {
+      // Check it is followed by an index
+      if (i + 1 >= argc) {
+        fprintf(stderr, "Missing argument for -i\n");
+        return -1;
+      }
+
+      // Entry specifier
+      targeted_extract = true;
+      char *endptr;
+      long extract_idx = strtol(argv[i + 1], &endptr, 0);
+      if (endptr == argv[i + 1]) {
+        fprintf(stderr, "Failed to parse index '%s'\n", argv[i + 1]);
+        return -1;
+      }
+
+      // Add to extract set
+      extract_indices.emplace(extract_idx);
+
+      // Skip arg and loop
+      i++;
+      continue;
+    }
+
+    // Basename?
+    if (input_basename == nullptr) {
+      input_basename = argv[i];
+      continue;
+    }
+
+    // Output dir?
+    if (output_path == nullptr) {
+      output_path = argv[i];
+      continue;
+    }
+
+    // Invalid state
+    usage(argv[0]);
     return -1;
   }
 
   // Test for input files
-  const char *input_basename = argv[1];
   const std::string hed_filename = mg::string::format("%s.hed", input_basename);
   const std::string mrg_filename = mg::string::format("%s.mrg", input_basename);
 
@@ -51,35 +99,29 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  // Write out each archive entry, either to the current dir or the out dir if
-  // specified
-  std::filesystem::path output_dir = ".";
-  if (argc == 3) {
-    output_dir = argv[2];
-  }
-
   // Ensure output dir exists
+  std::filesystem::path output_dir = output_path ? output_path : ".";
   if (!std::filesystem::exists(output_dir) &&
       !std::filesystem::create_directories(output_dir)) {
     fprintf(stderr, "Failed to create output path '%s'\n", output_dir.c_str());
     return -1;
   }
 
-  // Iterate the mrg entries and emit
+  // Utility method to write an index to an output file
   const std::string output_basename =
       std::filesystem::path(input_basename).stem();
-  for (std::vector<std::string>::size_type i = 0; i < mrg->entries().size();
-       i++) {
+  auto write_entry = [&](unsigned index) -> int {
     std::string output_filename =
-        mg::string::format("%s.%08lu.dat", output_basename.c_str(), i);
+        mg::string::format("%s.%08lu.dat", output_basename.c_str(), index);
 
     // If we have a name table, use that name as well
     if (has_nam) {
-      output_filename = mg::string::format(
-          "%s.%08lu.%s.dat", output_basename.c_str(), i, nam.names[i].c_str());
+      output_filename =
+          mg::string::format("%s.%08lu.%s.dat", output_basename.c_str(), index,
+                             nam.names[index].c_str());
     }
 
-    auto entry_data = mrg->entry_data(i);
+    auto entry_data = mrg->entry_data(index);
     std::filesystem::path output_path = output_dir;
     output_path.append(output_filename);
     if (!mg::fs::write_file(output_path.c_str(), entry_data)) {
@@ -87,6 +129,20 @@ int main(int argc, char **argv) {
     }
     fprintf(stderr, "Wrote %lu bytes to %s\n", entry_data.size(),
             output_path.c_str());
+
+    return 0;
+  };
+
+  // Iterate the mrg entries and emit
+  if (!targeted_extract) {
+    for (std::vector<std::string>::size_type i = 0; i < mrg->entries().size();
+         i++) {
+      write_entry(i);
+    }
+  } else {
+    for (long i : extract_indices) {
+      write_entry(i);
+    }
   }
 
   return 0;
