@@ -68,9 +68,10 @@ public:
   }
   const std::string_view entry_data(int index) const {
     const auto &entry = _entries.at(index);
+    const unsigned offset_bytes = entry.offset * Mrg::SECTOR_SIZE;
     const unsigned size_bytes = entry.size_sectors * Mrg::SECTOR_SIZE;
     return std::string_view(
-        reinterpret_cast<const char *>(_backing_data->data()) + entry.offset,
+        reinterpret_cast<const char *>(_backing_data->data()) + offset_bytes,
         size_bytes);
   }
 
