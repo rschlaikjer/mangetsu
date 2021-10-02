@@ -16,13 +16,16 @@ int main(int argc, char **argv) {
   const std::string hed_filename = mg::string::format("%s.hed", input_basename);
   const std::string mrg_filename = mg::string::format("%s.mrg", input_basename);
 
-  // Read raw data for hed/nam files
+  // Read raw data for hed file
   std::string hed_raw;
-  std::string mrg_raw;
   if (!mg::fs::read_file(hed_filename.c_str(), hed_raw)) {
     return -1;
   }
-  if (!mg::fs::read_file(mrg_filename.c_str(), mrg_raw)) {
+
+  // Try and map the mrg data
+  std::shared_ptr<mg::fs::MappedFile> mrg_data =
+      mg::fs::MappedFile::open(mrg_filename.c_str());
+  if (mrg_data == nullptr) {
     return -1;
   }
 
@@ -34,17 +37,17 @@ int main(int argc, char **argv) {
                        nam_read(nam_raw, nam);
 
   // Parse the MRG data
-  mg::data::Mrg mrg;
-  if (!mg::data::mrg_read(hed_raw, mrg_raw, mrg)) {
+  auto mrg = mg::data::MappedMrg::parse(hed_raw, mrg_data);
+  if (mrg == nullptr) {
     return -1;
   }
 
   // If we have a NAM and MRG, assert that the filename count matches the entry
   // count
-  if (mrg.entries.size() != nam.names.size()) {
+  if (mrg->entries().size() != nam.names.size()) {
     fprintf(stderr,
             "MRG entry count (%lu) does not match NAM entry count (%lu)\n",
-            mrg.entries.size(), nam.names.size());
+            mrg->entries().size(), nam.names.size());
     return -1;
   }
 
@@ -65,8 +68,8 @@ int main(int argc, char **argv) {
   // Iterate the mrg entries and emit
   const std::string output_basename =
       std::filesystem::path(input_basename).stem();
-  for (std::vector<std::string>::size_type i = 0; i < mrg.entries.size(); i++) {
-    const auto &entry = mrg.entries[i];
+  for (std::vector<std::string>::size_type i = 0; i < mrg->entries().size();
+       i++) {
     std::string output_filename =
         mg::string::format("%s.%08lu.dat", output_basename.c_str(), i);
 
@@ -76,12 +79,13 @@ int main(int argc, char **argv) {
           "%s.%08lu.%s.dat", output_basename.c_str(), i, nam.names[i].c_str());
     }
 
+    auto entry_data = mrg->entry_data(i);
     std::filesystem::path output_path = output_dir;
     output_path.append(output_filename);
-    if (!mg::fs::write_file(output_path.c_str(), entry.data)) {
+    if (!mg::fs::write_file(output_path.c_str(), entry_data)) {
       return -1;
     }
-    fprintf(stderr, "Wrote %lu bytes to %s\n", entry.data.size(),
+    fprintf(stderr, "Wrote %lu bytes to %s\n", entry_data.size(),
             output_path.c_str());
   }
 

@@ -65,6 +65,10 @@ bool read_file(const char *path, std::string &out) {
 }
 
 bool write_file(const char *path, const std::string &data) {
+  return write_file(path, std::string_view(data));
+}
+
+bool write_file(const char *path, const std::string_view &data) {
   // Open file
   const int fd = open(path, O_RDWR | O_CREAT | O_TRUNC, 0644);
   if (fd == -1) {

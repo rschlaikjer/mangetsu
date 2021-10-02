@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 namespace mg::fs {
 
@@ -18,9 +19,8 @@ public:
   ~MappedFile();
 
 public:
-  uint8_t *mutable_data();
-  const uint8_t *data() const;
-  ssize_t size() const;
+  const uint8_t *data() const { return _data; }
+  ssize_t size() const { return _size; }
 
 private:
   MappedFile(const uint8_t *data, ssize_t size) : _data(data), _size(size) {}
@@ -32,6 +32,7 @@ private:
 };
 
 bool read_file(const char *path, std::string &out);
+bool write_file(const char *path, const std::string_view &data);
 bool write_file(const char *path, const std::string &data);
 
 } // namespace mg::fs
