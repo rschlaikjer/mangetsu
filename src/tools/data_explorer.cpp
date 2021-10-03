@@ -142,7 +142,7 @@ struct DataFile {
          *reinterpret_cast<std::vector<std::string> *>(parsed_data)) {
       ImGui::Separator();
       ImGui::Text("%d", i++);
-      ImGui::Text(str.c_str());
+      ImGui::Text("%s", str.c_str());
     }
 
     return false;
@@ -159,16 +159,14 @@ struct DataFile {
     for (auto &name : nam->names) {
       ImGui::Separator();
       ImGui::Text("%d", i++);
-      ImGui::Text(name.c_str());
+      ImGui::Text("%s", name.c_str());
     }
     return false;
   }
 
   bool render_mzp() {
     mg::data::Mzp *mzp = reinterpret_cast<mg::data::Mzp *>(parsed_data);
-    ImGui::Text(
-        mg::string::format("MZP with %u entries", mzp->entry_headers.size())
-            .c_str());
+    ImGui::Text("MZP with %lu entries", mzp->entry_headers.size());
 
     bool did_add_ctx = false;
     for (unsigned i = 0; i < mzp->entry_headers.size(); i++) {
