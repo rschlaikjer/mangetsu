@@ -87,9 +87,6 @@ bool mzx_decompress(const std::string &compressed, std::string &out,
     return false;
   }
 
-  // Maic word
-  uint8_t magic[4];
-
   // Resize output buffer to accomodate decompressed data
   out.resize(header.decompressed_size);
 

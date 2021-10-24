@@ -34,7 +34,6 @@ int main(int argc, char **argv) {
       const uint32_t entry_i_start = entry_i.data_offset_relative();
       const uint32_t entry_i_end = entry_i_start + entry_i.entry_data_size();
       const uint32_t entry_j_start = entry_j.data_offset_relative();
-      const uint32_t entry_j_end = entry_j_start + entry_j.entry_data_size();
       if (entry_j_start >= entry_i_start && entry_j_start <= entry_i_end) {
         fprintf(stderr, "Entry %u begins inside of entry %u\n", j, i);
       }
