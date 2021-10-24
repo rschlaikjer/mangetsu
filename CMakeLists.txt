@@ -24,38 +24,44 @@ set(GCC_COVERAGE_COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-unknown
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS} ${GCC_OPTIMIZATION}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
 
-# Need openGL
-include(FindOpenGL)
-include_directories(${OPENGL_INCLUDE_DIRS})
+# Put UI stuff behind a build flag so that people don't have to mess around
+# with deps as much by default
+if (${BUILD_GUI})
+  # OpenGL
+  include(FindOpenGL)
+  include_directories(${OPENGL_INCLUDE_DIRS})
 
-# Glfw for windowing
-find_package(PkgConfig)
-pkg_check_modules(PC_LIBGLFW REQUIRED glfw3)
-include_directories(${PC_LIBGLFW_INCLUDE_DIRS})
-
+  # Glfw for windowing
+  find_package(PkgConfig)
+  pkg_check_modules(PC_LIBGLFW REQUIRED glfw3)
+  include_directories(${PC_LIBGLFW_INCLUDE_DIRS})
+endif()
 
 include_directories(include)
 
 # Json library
 include_directories(vendor/json)
 
-include_directories(vendor/imgui/)
-add_library(imgui
-    STATIC
-    vendor/imgui/imgui.cpp
-    vendor/imgui/imgui_draw.cpp
-    vendor/imgui/imgui_impl_glfw.cpp
-    vendor/imgui/imgui_impl_opengl2.cpp
-    vendor/imgui/imgui_tables.cpp
-    vendor/imgui/imgui_widgets.cpp
-)
-set_target_properties(imgui
-    PROPERTIES POSITION_INDEPENDENT_CODE ON
-)
-target_link_libraries(imgui
-   ${OPENGL_LIBRARIES}
-   ${PC_LIBGLFW_LIBRARIES}
-)
+# Only build imgui lib if UI is enabled
+if (${BUILD_GUI})
+  include_directories(vendor/imgui/)
+  add_library(imgui
+      STATIC
+      vendor/imgui/imgui.cpp
+      vendor/imgui/imgui_draw.cpp
+      vendor/imgui/imgui_impl_glfw.cpp
+      vendor/imgui/imgui_impl_opengl2.cpp
+      vendor/imgui/imgui_tables.cpp
+      vendor/imgui/imgui_widgets.cpp
+  )
+  set_target_properties(imgui
+      PROPERTIES POSITION_INDEPENDENT_CODE ON
+  )
+  target_link_libraries(imgui
+     ${OPENGL_LIBRARIES}
+     ${PC_LIBGLFW_LIBRARIES}
+  )
+endif()
 
 add_library(mg_util
   src/util/fs.cpp
@@ -137,13 +143,15 @@ target_link_libraries(nam_read
     mg_data
 )
 
-add_executable(data_explorer
-    src/tools/data_explorer.cpp
-)
-target_link_libraries(data_explorer
-    mg_data
-    imgui
-)
+if (${BUILD_GUI})
+  add_executable(data_explorer
+      src/tools/data_explorer.cpp
+  )
+  target_link_libraries(data_explorer
+      mg_data
+      imgui
+  )
+endif()
 
 add_executable(script_text_to_content_json
     src/tools/script_text_to_content_json.cpp
