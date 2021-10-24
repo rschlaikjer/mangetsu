@@ -1,4 +1,4 @@
-# Mangetsu
+# Mangetsu 満月
 
 A collection of tools for reading/writing the data formats packaged in the
 Nintendo Switch version of the Tsukihime Remake.
