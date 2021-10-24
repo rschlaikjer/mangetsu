@@ -79,13 +79,6 @@ target_link_libraries(mg_data
     mg_util
 )
 
-add_executable(mangetsu
-  src/mangetsu.cpp
-)
-target_link_libraries(mangetsu
-  mg_data
-)
-
 add_executable(nxx_decompress
     src/tools/nxx_decompress.cpp
 )
