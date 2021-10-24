@@ -76,3 +76,11 @@ Note that NXCX support is not tested due to lack of sample files.
 - `nxx_decompress`: Given a file in either NXGZ or NXCX format, uncompress the
   data to a new file.
 - `nxgx_compress`: Given a raw file, compress in NXGZ format.
+
+### GUI Programs
+
+If GUI support is enabled, the `data_explorer` file will be built. This UI
+allows reinterpreting a file as any of the formats above on the fly, as well as
+recursively extracting and displaying sub-archives of those files. It also
+features a hex view and other tools designed to make analysis of raw formats
+easier.
