@@ -11,7 +11,7 @@ To build all tools, you will need at least the following
 sudo apt install -y build-essential cmake zlib1g-dev libssl-dev
 ```
 
-If you also with to build the graphical tools, you will need some additional
+If you also wish to build the graphical tools, you will need some additional
 dependencies
 
 ```bash
