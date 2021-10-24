@@ -25,7 +25,7 @@ git clone git@github.com:rschlaikjer/mangetsu.git
 cd mangetsu
 mkdir build && cd build
 cmake ..                # No UI programs
-cmake -DBUILD_GUI ..    # With UI programs
+cmake -DBUILD_GUI=On .. # With UI programs
 make
 ```
 
