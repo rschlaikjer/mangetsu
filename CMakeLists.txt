@@ -68,6 +68,7 @@ add_library(mg_util
 )
 
 add_library(mg_data
+  src/data/hfa.cpp
   src/data/mzp.cpp
   src/data/mzx.cpp
   src/data/mrg.cpp
@@ -192,6 +193,14 @@ add_executable(mrg_replace
     src/tools/mrg_replace.cpp
 )
 target_link_libraries(mrg_replace
+    mg_data
+    stdc++fs
+)
+
+add_executable(hfa_extract
+    src/tools/hfa_extract.cpp
+)
+target_link_libraries(hfa_extract
     mg_data
     stdc++fs
 )
