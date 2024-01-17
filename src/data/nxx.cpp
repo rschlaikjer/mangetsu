@@ -123,9 +123,14 @@ bool nxcx_decompress(const Nxx &header, const uint8_t *data, std::string &out) {
 
   // Perform inflation
   inflateInit(&istream);
-  const int err = inflate(&istream, Z_SYNC_FLUSH);
-  if (err != Z_OK) {
-    fprintf(stderr, "zlib error: %d: %s\n", err, istream.msg);
+  const int err = inflate(&istream, Z_FINISH);
+  if (err != Z_STREAM_END) {
+    if (err == Z_OK) {
+      fprintf(stderr,
+              "zlib error: did not reach end of stream, need more data?\n");
+    } else {
+      fprintf(stderr, "zlib error: %d: %s\n", err, istream.msg);
+    }
     return false;
   }
   inflateEnd(&istream);
