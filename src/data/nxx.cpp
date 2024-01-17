@@ -130,7 +130,7 @@ bool nxcx_decompress(const Nxx &header, const uint8_t *data, std::string &out) {
   }
   const int err2 = inflateEnd(&istream);
   if (err2 != Z_OK) {
-    fprintf(stderr, "zlib error: %d: %s\n", err, istream.msg);
+    fprintf(stderr, "zlib error: %d: %s\n", err2, istream.msg);
     return false;
   }
 
